@@ -31,6 +31,13 @@ public class Autore {
     @OneToMany(cascade=CascadeType.ALL,mappedBy = "autore", fetch = FetchType.EAGER)
     private List<BlogPost> blogPostList;
 
+    public Autore(String nome, String cognome, String email, LocalDate dataDiNascita) {
+        this.nome = nome;
+        this.cognome = cognome;
+        this.email = email;
+        this.dataDiNascita = dataDiNascita;
+    }
+
     public static class AutoreBuilder{
         private Faker faker = new Faker(Locale.ITALY);
         private String nome=faker.name().firstName();

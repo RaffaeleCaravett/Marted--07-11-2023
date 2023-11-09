@@ -37,4 +37,12 @@ private int tempoDiLettura;
         this.autore=autore;
     }
 
+    public BlogPost(Categoria categoria, String titolo, String cover, String contenuto, int tempoDiLettura, Autore autore) {
+        this.categoria = categoria;
+        this.titolo = titolo;
+        this.cover = cover;
+        this.contenuto = contenuto;
+        this.tempoDiLettura = tempoDiLettura;
+        this.autore = autore;
+    }
 }

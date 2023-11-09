@@ -1,6 +1,9 @@
 package com.example.blogging.blogposts;
 
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import com.example.blogging.autore.Autore;
 import com.example.blogging.autore.AutoreRepository;
 import com.example.blogging.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,15 +12,23 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Map;
+
 @Service
 public class BlogpostService {
     @Autowired
     private BlogPostRepository blogpostRepository;
+    @Autowired
+    private Cloudinary cloudinary;
   @Autowired
   private AutoreRepository autoreRepository;
-    public BlogPost save(BlogPost body){
-        body.setCover("https://picsum.photos/200/300");
-        return blogpostRepository.save(body);
+    public BlogPost save(BlogpostPayload body){
+        Autore autore = autoreRepository.findById(body.autore_id()).get();
+        BlogPost blogPost = new BlogPost(body.categoria(), body.titolo(),body.cover(),body.contenuto(),body.tempoDiLettura(),autore);
+        return blogpostRepository.save(blogPost);
     }
 
     public Page<BlogPost> getBlogPosts(int page, int size, String orderBy) {
@@ -42,5 +53,21 @@ public class BlogpostService {
         found.setContenuto(body.getContenuto());
         found.setTempoDiLettura(body.getTempoDiLettura());
         return blogpostRepository.save(found);
+    }
+    public String uploadPicture(long id,MultipartFile file) throws IOException {
+        try {
+            Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            String imageUrl = (String) uploadResult.get("url");
+
+            BlogPost blogPost = blogpostRepository.findById(id).orElse(null);
+            if (blogPost != null) {
+                blogPost.setCover(imageUrl);
+                blogpostRepository.save(blogPost);
+            }
+
+            return imageUrl;
+        } catch (IOException e) {
+            throw new RuntimeException("Impossibile caricare l'immagine", e);
+        }
     }
 }
