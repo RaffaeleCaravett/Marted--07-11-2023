@@ -31,7 +31,6 @@ public class BlogpostController {
     public long saveBlogpost(@RequestBody BlogpostDto body){
         if(!Objects.equals(body.getContenuto(), "")){
             BlogPost blogpost = new BlogPost(body.getCategoria(), body.getTitolo(), body.getContenuto(), body.getTempoDiLettura(),autoreRepository.findById(body.getAutore_id()).get());
-
             return blogpostService.save(blogpost).getId();
         }else{
             throw new BadRequestException("Il contenuto del blogpost è vuoto");
